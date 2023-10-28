@@ -23,6 +23,7 @@ func TestNextToken(t *testing.T) {
 	} else {
 		r = false	
 	}
+	== !=
 	`
 
 	tests := []struct {
@@ -98,6 +99,8 @@ func TestNextToken(t *testing.T) {
 		{token.ASSIGN, "="},
 		{token.FALSE, "false"},
 		{token.CLOSE_BRACE, "}"},
+		{token.EQ, "=="},
+		{token.NEQ, "!="},
 		{token.EOF, ""},
 	}
 

@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 mod token;
 
+use std::io::Write;
+
 use token::*;
 
 struct Lexer {
@@ -25,7 +27,14 @@ impl Lexer {
     pub fn next_token(&mut self) -> Result<Token, String> {
         self.skip_whitespace();
         let token = match self.ch as char {
-            '=' => Token::Assign,
+            '=' => {
+                if self.peek_char() as char == '=' {
+                    self.read_char();
+                    Token::Equals
+                } else {
+                    Token::Assign
+                }
+            },
             ';' => Token::Semicolon,
             '(' => Token::OpenParenthesis,
             ')' => Token::CloseParenthesis,
@@ -33,7 +42,14 @@ impl Lexer {
             '}' => Token::CloseBrace,
             ',' => Token::Comma,
             '+' => Token::Plus,
-            '!' => Token::Bang,
+            '!' => {
+                if self.peek_char() as char == '=' {
+                    self.read_char();
+                    Token::NotEquals
+                } else {
+                    Token::Bang
+                }
+            },
             '-' => Token::Minus,
             '/' => Token::Slash,
             '*' => Token::Asterisk,
@@ -50,6 +66,14 @@ impl Lexer {
         }
 
         Ok(token)
+    }
+
+    fn peek_char(&mut self) -> u8 {
+        if self.read_position >= self.input.len() {
+            0
+        } else {
+            self.input.as_bytes()[self.read_position]
+        }
     }
 
     fn skip_whitespace(&mut self) {
@@ -109,7 +133,18 @@ fn is_letter(c: char) -> bool {
 }
 
 fn main() {
-    
+    loop {
+        print!(">> ");
+        std::io::stdout().flush().unwrap();
+        let code = std::io::stdin().lines().take(1).flatten().last().unwrap();
+        let mut lexer = Lexer::new(code);
+        while let Ok(token) = lexer.next_token() {
+            if token == Token::EoF {
+                break;
+            }
+            println!("{:?}", token);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -130,6 +165,7 @@ mod tests {
             !-/*5;
 	        5 < 10 > 5;
             return if (true) 1 else 2
+            == !=
         "#;
         let mut lexer = Lexer::new(input.to_string());
         let expected_tokens = vec![
@@ -189,6 +225,8 @@ mod tests {
             Token::Int(1),
             Token::Keyword(Keyword::Else),
             Token::Int(2),
+            Token::Equals,
+            Token::NotEquals,
             Token::EoF,
         ];
 

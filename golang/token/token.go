@@ -1,10 +1,16 @@
 package token
 
+import "fmt"
+
 type TokenType string
 
 type Token struct {
 	Type    TokenType
 	Literal string
+}
+
+func (t Token) String() string {
+	return fmt.Sprintf("%s = %s", string(t.Type), t.Literal)
 }
 
 const (
@@ -24,6 +30,8 @@ const (
 	SLASH    = "/"
 	LT       = "<"
 	GT       = ">"
+	EQ       = "=="
+	NEQ      = "!="
 
 	//Delimiters
 	COMMA             = ","

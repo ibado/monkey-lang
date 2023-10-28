@@ -14,6 +14,8 @@ pub enum Token {
     Asterisk,
     LessThan,
     GreaterThan,
+    Equals,
+    NotEquals,
     Comma,
     Semicolon,
     OpenParenthesis,
